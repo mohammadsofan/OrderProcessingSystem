@@ -1,4 +1,5 @@
-﻿using OrderProcessingSystem.Api.Dtos.Requests;
+﻿using Microsoft.AspNetCore.Identity;
+using OrderProcessingSystem.Api.Dtos.Requests;
 using OrderProcessingSystem.Api.Interfaces.IRepository;
 using OrderProcessingSystem.Api.Interfaces.IService;
 using OrderProcessingSystem.Api.Models;
@@ -9,19 +10,66 @@ namespace OrderProcessingSystem.Api.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _repository;
+        private readonly IPasswordHasher<object> _passwordHasher;
+        private readonly ITokenService _tokenService;
 
-        public UserService(IUserRepository repository)
+        public UserService(IUserRepository repository,
+            IPasswordHasher<object> passwordHasher,
+            ITokenService tokenService)
         {
             _repository = repository;
+            _passwordHasher = passwordHasher;
+            _tokenService = tokenService;
         }
-        public Task<ServiceResult<object>> LoginUserAsync(RegisterUserRequestDto request)
+        public async Task<ServiceResult<object>> LoginUserAsync(LoginUserRequestDto request)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var user = await _repository.GetOneByFilterAsync(u => u.Email.ToLower() == request.Email.ToLower());
+                if (user == null)
+                {
+                    return ServiceResult<object>.Failure("Invalid email or password.");
+                }
+                var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(request, user.HashedPassword, request.Password);
+                if (passwordVerificationResult == PasswordVerificationResult.Failed)
+                {
+                    return ServiceResult<object>.Failure("Invalid email or password.");
+                }
 
-        public Task<ServiceResult> RegisterUserAsync(RegisterUserRequestDto request)
+                var token = _tokenService.GenerateToken(
+                    user.Id.ToString(),
+                    user.UserName,
+                    user.Email,
+                    user.Role,
+                    DateTime.UtcNow.AddHours(1)
+                );
+                return ServiceResult<object>.Success(new { Token = token }, "User Logged in successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<object>.Failure($"Failure with login process: {ex.Message}");
+            }
+        }
+        public async Task<ServiceResult> RegisterUserAsync(RegisterUserRequestDto request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var user = new User
+                {
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    UserName = request.UserName,
+                    Email = request.Email,
+                    HashedPassword = _passwordHasher.HashPassword(request, request.Password),
+                    Role = "User"
+                };
+                await _repository.AddAsync(user);
+                return ServiceResult.Success("User registered successfully.");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult.Failure($"Failure with register proccess :{ex.Message}");
+            }
         }
     }
 }
