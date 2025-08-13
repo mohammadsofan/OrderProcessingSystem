@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using OrderProcessingSystem.Api.Interfaces;
 using System.Text;
 
 namespace OrderProcessingSystem.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public async static Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,11 @@ namespace OrderProcessingSystem.Api
 
             app.MapControllers();
 
+            using(var scope = app.Services.CreateScope())
+            {
+                var dbInitializer = scope.ServiceProvider.GetRequiredService<IDBInitializer>();
+                await dbInitializer.InitializeAsync();
+            }
             app.Run();
         }
     }

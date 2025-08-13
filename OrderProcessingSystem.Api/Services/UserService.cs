@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using OrderProcessingSystem.Api.Constants;
 using OrderProcessingSystem.Api.Dtos.Requests;
 using OrderProcessingSystem.Api.Interfaces.IRepository;
 using OrderProcessingSystem.Api.Interfaces.IService;
@@ -61,7 +62,7 @@ namespace OrderProcessingSystem.Api.Services
                     UserName = request.UserName,
                     Email = request.Email,
                     HashedPassword = _passwordHasher.HashPassword(request, request.Password),
-                    Role = "User"
+                    Role = ApplicationRoles.User
                 };
                 await _repository.AddAsync(user);
                 return ServiceResult.Success("User registered successfully.");
