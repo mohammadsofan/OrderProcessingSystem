@@ -1,8 +1,9 @@
 ﻿using OrderProcessingSystem.Api.Enums;
+using OrderProcessingSystem.Api.Interfaces;
 
 namespace OrderProcessingSystem.Api.Models
 {
-    public class Order
+    public class Order:IEntity
     {
         public int Id { get; set; }
         public int UserId { get; set; }

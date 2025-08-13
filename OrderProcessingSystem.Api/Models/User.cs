@@ -1,6 +1,8 @@
-﻿namespace OrderProcessingSystem.Api.Models
+﻿using OrderProcessingSystem.Api.Interfaces;
+
+namespace OrderProcessingSystem.Api.Models
 {
-    public class User
+    public class User:IEntity
     {
         public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;

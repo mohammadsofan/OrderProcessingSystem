@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderProcessingSystem.Api.Data;
 using OrderProcessingSystem.Api.Exceptions;
+using OrderProcessingSystem.Api.Interfaces;
 using OrderProcessingSystem.Api.Interfaces.IRepository;
 using System.Linq.Expressions;
 
 namespace OrderProcessingSystem.Api.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class,IEntity
     {
         private readonly ApplicationDbContext _context;
         private readonly DbSet<T> _dbSet;
@@ -46,7 +47,8 @@ namespace OrderProcessingSystem.Api.Repositories
             }
         }
 
-        public async Task<IEnumerable<T>> GetAllByFilterAsync(Expression<Func<T, bool>>? filter = null)
+        public async Task<IEnumerable<T>> GetAllByFilterAsync(Expression<Func<T, bool>>? filter = null,
+            params Expression<Func<T, object>>[] includes)
         {
             try
             {
@@ -54,6 +56,10 @@ namespace OrderProcessingSystem.Api.Repositories
                 if (filter != null)
                 {
                     queryable = queryable.Where(filter);
+                }
+                foreach (var include in includes)
+                {
+                    queryable = queryable.Include(include);
                 }
                 return await queryable.ToListAsync();
             }
@@ -63,11 +69,17 @@ namespace OrderProcessingSystem.Api.Repositories
             }
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id, params Expression<Func<T, object>>[] includes)
         {
             try
             {
-                return await _dbSet.FindAsync(id);
+                IQueryable<T> queryable = _dbSet.AsNoTracking();
+                foreach (var include in includes)
+                {
+                    queryable = queryable.Include(include);
+                }
+                queryable = queryable.Where(e=>e.Id == id);
+                return await queryable.FirstOrDefaultAsync();
             }
             catch (Exception)
             {
@@ -75,11 +87,18 @@ namespace OrderProcessingSystem.Api.Repositories
             }
         }
 
-        public async Task<T?> GetOneByFilterAsync(Expression<Func<T, bool>> filter)
+        public async Task<T?> GetOneByFilterAsync(Expression<Func<T, bool>> filter,
+            params Expression<Func<T, object>>[] includes)
         {
             try
             {
-                return await _dbSet.FirstOrDefaultAsync(filter);
+                IQueryable<T> queryable = _dbSet.AsNoTracking();
+                foreach (var include in includes)
+                {
+                    queryable = queryable.Include(include);
+                }
+                queryable = queryable.Where(filter);
+                return await queryable.FirstOrDefaultAsync();
             }
             catch (Exception)
             {

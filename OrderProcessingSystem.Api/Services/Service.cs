@@ -55,11 +55,12 @@ namespace OrderProcessingSystem.Api.Services
             }
         }
 
-        public async Task<ServiceResult<IEnumerable<TResponse>>> GetAllByFilterAsync(Expression<Func<TEntity, bool>>? filter = null)
+        public virtual async Task<ServiceResult<IEnumerable<TResponse>>> GetAllByFilterAsync(Expression<Func<TEntity, bool>>? filter = null,
+            params Expression<Func<TEntity, object>>[] includes)
         {
             try
             {
-                var response = (await _repository.GetAllByFilterAsync(filter))
+                var response = (await _repository.GetAllByFilterAsync(filter,includes))
                     .Select(entity => entity.Adapt<TResponse>())
                     .ToList();
                 return ServiceResult<IEnumerable<TResponse>>.Success(response,
@@ -72,11 +73,11 @@ namespace OrderProcessingSystem.Api.Services
             }
         }
 
-        public async Task<ServiceResult<TResponse?>> GetByIdAsync(int id)
+        public virtual async Task<ServiceResult<TResponse?>> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes)
         {
             try
             {
-                var entity = await _repository.GetByIdAsync(id);
+                var entity = await _repository.GetByIdAsync(id,includes);
                 if (entity == null)
                 {
                     return ServiceResult<TResponse?>.Failure("Entity not found.", ServiceResultStatus.NotFound);
@@ -92,11 +93,12 @@ namespace OrderProcessingSystem.Api.Services
             }
         }
 
-        public async Task<ServiceResult<TResponse?>> GetOneByFilterAsync(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<ServiceResult<TResponse?>> GetOneByFilterAsync(Expression<Func<TEntity, bool>> filter
+            , params Expression<Func<TEntity, object>>[] includes)
         {
             try
             {
-                var entity = await _repository.GetOneByFilterAsync(filter);
+                var entity = await _repository.GetOneByFilterAsync(filter, includes);
                 if (entity == null)
                 {
                     return ServiceResult<TResponse?>.Failure("Entity not found.", ServiceResultStatus.NotFound);

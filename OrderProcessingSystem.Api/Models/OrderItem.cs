@@ -1,6 +1,8 @@
-﻿namespace OrderProcessingSystem.Api.Models
+﻿using OrderProcessingSystem.Api.Interfaces;
+
+namespace OrderProcessingSystem.Api.Models
 {
-    public class OrderItem
+    public class OrderItem: IEntity
     {
         public int Id { get; set; }
         public int OrderId { get; set; }
