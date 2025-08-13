@@ -3,6 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OrderProcessingSystem.Api.Interfaces;
+using OrderProcessingSystem.Api.Interfaces.IRepository;
+using OrderProcessingSystem.Api.Interfaces.IService;
+using OrderProcessingSystem.Api.Repositories;
+using OrderProcessingSystem.Api.Services;
+using OrderProcessingSystem.Api.Utils;
 using System.Text;
 
 namespace OrderProcessingSystem.Api
@@ -37,6 +42,17 @@ namespace OrderProcessingSystem.Api
                 };
             });
             builder.Services.AddAuthorization();
+            builder.Services.AddScoped<IDBInitializer,DBInitializer>();
+            builder.Services.AddScoped<IProductRepository,ProductRepostitory>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+
             var app = builder.Build();
 
 

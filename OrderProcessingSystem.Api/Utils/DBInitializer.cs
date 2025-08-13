@@ -26,7 +26,6 @@ namespace OrderProcessingSystem.Api.Utils
                 {
                     var user = new User()
                     {
-
                         FirstName = "Admin",
                         LastName = "Admin",
                         UserName = "Admin",
