@@ -1,6 +1,12 @@
 ﻿namespace OrderProcessingSystem.Api.Exceptions
 {
-    public class EntityNotFoundException
+    public class EntityNotFoundException:Exception
     {
+        public EntityNotFoundException(string message) : base(message)
+        {
+        }
+        public EntityNotFoundException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }
