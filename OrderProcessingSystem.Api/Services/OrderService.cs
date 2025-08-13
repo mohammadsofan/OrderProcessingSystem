@@ -10,8 +10,8 @@ namespace OrderProcessingSystem.Api.Services
 {
     public class OrderService:Service<OrderRequestDto, OrderResponseDto, Order>, IOrderService
     {
-        private readonly IRepository<Order> _repository;
-        public OrderService(IRepository<Order> repository) : base(repository)
+        private readonly IOrderRepository _repository;
+        public OrderService(IOrderRepository repository) : base(repository)
         {
             _repository = repository;
         }

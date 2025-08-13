@@ -8,9 +8,9 @@ namespace OrderProcessingSystem.Api.Services
 {
     public class ProductService : Service<ProductRequestDto, ProductResponseDto, Product>, IProductService
     {
-        private readonly IRepository<Product> _repository;
+        private readonly IProductRepository _repository;
 
-        public ProductService(IRepository<Product> repository) : base(repository)
+        public ProductService(IProductRepository repository) : base(repository)
         {
             _repository = repository;
         }
