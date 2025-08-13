@@ -12,6 +12,4 @@ namespace OrderProcessingSystem.Api.Repositories
             _context = context;
         }
     }
-    {
-    }
 }

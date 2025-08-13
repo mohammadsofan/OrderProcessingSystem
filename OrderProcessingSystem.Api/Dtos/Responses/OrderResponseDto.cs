@@ -1,17 +1,14 @@
-﻿using OrderProcessingSystem.Api.Enums;
-
-namespace OrderProcessingSystem.Api.Models
+﻿namespace OrderProcessingSystem.Api.Dtos.Responses
 {
-    public class Order
+    public class OrderResponseDto
     {
         public int Id { get; set; }
         public int UserId { get; set; }
-        public User? User { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.UtcNow;
         public decimal TotalAmount { get; set; }
         public string PhoneNumber { get; set; } = string.Empty;
         public string ShippingAddress { get; set; } = string.Empty;
-        public OrderStatus Status { get; set; } = OrderStatus.Pending;
-        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public Enums.OrderStatus Status { get; set; } = Enums.OrderStatus.Pending;
+        public List<OrderItemResponseDto> OrderItems { get; set; } = new List<OrderItemResponseDto>();
     }
 }
