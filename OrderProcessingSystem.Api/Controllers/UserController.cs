@@ -113,6 +113,8 @@ namespace OrderProcessingSystem.Api.Controllers
             if (result.IsSuccess)
             {
                 // i can implement add,remove range but i will do it later (i dont have time)
+                // i still did not check if product stock is enough, i will do it later
+                // i did not decrement product stock yet, i will do it later
                 // and i may use a transaction here, i will do it later or today if i have time
                 foreach (var item in cartItemsResult.Data)
                 {
@@ -128,10 +130,20 @@ namespace OrderProcessingSystem.Api.Controllers
                 var orderPlacedMessage = new OrderPlacedMessage()
                 {
                     Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value!,
-                    Order = result.Data,
+                    UserName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value!,
+                    PhoneNumber = request.PhoneNumber,
+                    ShippingAddress = request.ShippingAddress,
+                    PlacedAt = DateTime.UtcNow,
+                    TotalAmount = orderRequest.TotalAmount,
+                    Items = cartItemsResult.Data.Select(ci => new OrderPlacedItem
+                    {                       
+                        ProductName = ci.Product!.Name,
+                        Quantity = ci.Quantity,
+                        Price = ci.Product.Price,
+                    }).ToList()
                 };
                 await _messageBroker.SendMessage<OrderPlacedMessage>(orderPlacedMessage);
-                return CreatedAtRoute(nameof(GetUserOrdersAsync), null, result.Data);
+                return Created();
             }
             return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse.Failure("Unexpected error occurred"));
         }

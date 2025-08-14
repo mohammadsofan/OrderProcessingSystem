@@ -7,11 +7,19 @@ namespace OrderProcessingSystem.Api.Services
 {
     public class MessageBrokerService:IMessageBrokerService
     {
+        private readonly IConfiguration _configuration;
+
+        public MessageBrokerService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public async Task SendMessage<T>(T message)
         {
             var connectionFactory = new ConnectionFactory()
             {
-                Uri = new Uri("amqp://guest:guest@localhost:5672"),
+                HostName = _configuration["RabbitMQ:Host"]!,
+                UserName = _configuration["RabbitMQ:User"]!,
+                Password = _configuration["RabbitMQ:Pass"]!,
                 ClientProvidedName = "OrderProcessingSystem.Api"
             };
 

@@ -1,9 +1,12 @@
-﻿using OrderProcessingSystem.Api.Dtos.Responses;
-using RabbitMQ.Client.Exceptions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace OrderProcessingSystem.Api.Wrappers
+namespace OrderProcessingSystem.OrderPlacedService.Messages
 {
-    public class OrderPlacedMessage
+    internal class OrderPlacedMessage
     {
         public string Email { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
@@ -14,7 +17,7 @@ namespace OrderProcessingSystem.Api.Wrappers
         public IList<OrderPlacedItem> Items { get; set; } = new List<OrderPlacedItem>();
 
     }
-    public class OrderPlacedItem
+    internal class OrderPlacedItem
     {
         public string ProductName { get; set; } = string.Empty;
         public int Quantity { get; set; }
