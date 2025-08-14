@@ -49,6 +49,7 @@ namespace OrderProcessingSystem.Api
                 options.SuppressModelStateInvalidFilter = true;
             });
             builder.Services.AddAuthorization();
+
             builder.Services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             builder.Services.AddScoped<IDBInitializer,DBInitializer>();
             builder.Services.AddScoped<IProductRepository,ProductRepostitory>();
@@ -71,7 +72,7 @@ namespace OrderProcessingSystem.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseRouting();
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
