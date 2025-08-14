@@ -34,6 +34,7 @@ namespace OrderProcessingSystem.Api.Utils
                         Role = ApplicationRoles.Admin,
                     };
                     await _context.Users.AddAsync(user);
+                    await _context.SaveChangesAsync();
                 }
             }
             catch (Exception ex)

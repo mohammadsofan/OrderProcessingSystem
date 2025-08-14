@@ -31,12 +31,12 @@ namespace OrderProcessingSystem.Api.Services
                 var user = await _repository.GetOneByFilterAsync(u => u.Email.ToLower() == request.Email.ToLower());
                 if (user == null)
                 {
-                    return ServiceResult<object>.Failure("Invalid email or password.");
+                    return ServiceResult<object>.Failure("Invalid email or password.",ServiceResultStatus.BadRequest);
                 }
                 var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(request, user.HashedPassword, request.Password);
                 if (passwordVerificationResult == PasswordVerificationResult.Failed)
                 {
-                    return ServiceResult<object>.Failure("Invalid email or password.");
+                    return ServiceResult<object>.Failure("Invalid email or password.", ServiceResultStatus.BadRequest);
                 }
 
                 var token = _tokenService.GenerateToken(
