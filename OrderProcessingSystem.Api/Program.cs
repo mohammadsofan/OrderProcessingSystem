@@ -1,7 +1,9 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using OrderProcessingSystem.Api.Data;
 using OrderProcessingSystem.Api.Interfaces;
 using OrderProcessingSystem.Api.Interfaces.IRepository;
 using OrderProcessingSystem.Api.Interfaces.IService;
@@ -24,7 +26,7 @@ namespace OrderProcessingSystem.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddDbContext<Data.ApplicationDbContext>(options =>
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddAuthentication(options =>
             {
@@ -42,6 +44,7 @@ namespace OrderProcessingSystem.Api
                 };
             });
             builder.Services.AddAuthorization();
+            builder.Services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             builder.Services.AddScoped<IDBInitializer,DBInitializer>();
             builder.Services.AddScoped<IProductRepository,ProductRepostitory>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
