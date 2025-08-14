@@ -93,6 +93,7 @@ namespace OrderProcessingSystem.Api
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IOrderItemService, OrderItemService>();
             builder.Services.AddScoped<ICartItemService, CartItemService>();
+            builder.Services.AddScoped<IMessageBrokerService, MessageBrokerService>();
             var app = builder.Build();
 
 
