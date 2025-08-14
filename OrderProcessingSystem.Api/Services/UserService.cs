@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using OrderProcessingSystem.Api.Constants;
 using OrderProcessingSystem.Api.Dtos.Requests;
+using OrderProcessingSystem.Api.Enums;
+using OrderProcessingSystem.Api.Exceptions;
 using OrderProcessingSystem.Api.Interfaces.IRepository;
 using OrderProcessingSystem.Api.Interfaces.IService;
 using OrderProcessingSystem.Api.Models;
@@ -66,6 +68,10 @@ namespace OrderProcessingSystem.Api.Services
                 };
                 await _repository.AddAsync(user);
                 return ServiceResult.Success("User registered successfully.");
+            }
+            catch (ConflictDbException ex)
+            {
+                return ServiceResult.Failure($"Conflict error: {ex.Message}", ServiceResultStatus.Conflict);
             }
             catch (Exception ex)
             {

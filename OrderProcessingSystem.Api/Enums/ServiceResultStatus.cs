@@ -3,6 +3,7 @@
     public enum ServiceResultStatus
     {
         Success,
+        Conflict,
         BadRequest,
         NotFound,
         InternalServerError

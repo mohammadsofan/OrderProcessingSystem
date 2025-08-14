@@ -23,7 +23,11 @@ namespace OrderProcessingSystem.Api.Repositories
                 await _dbSet.AddAsync(entity);
                 await SaveChangesAsync();
             }
-            catch(Exception)
+            catch (DbUpdateException ex)
+            {
+                throw new ConflictDbException("An error occurred while adding the entity to the database.", ex);
+            }
+            catch (Exception)
             {
                 throw;
             }
@@ -128,6 +132,10 @@ namespace OrderProcessingSystem.Api.Repositories
                 }
                 _context.Entry(existingEntity).CurrentValues.SetValues(entity);
                 await SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new ConflictDbException("An error occurred while updating the entity in the database.", ex);
             }
             catch (Exception)
             {

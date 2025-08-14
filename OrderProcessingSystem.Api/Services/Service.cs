@@ -28,6 +28,10 @@ namespace OrderProcessingSystem.Api.Services
                 var response = entityToAdd.Adapt<TResponse>();
                 return ServiceResult<TResponse>.Success(response, "Entity added successfully.");
             }
+            catch (ConflictDbException ex)
+            {
+                return ServiceResult<TResponse>.Failure($"Conflict error: {ex.Message}", ServiceResultStatus.Conflict);
+            }
             catch (EntityNotFoundException ex)
             {
                 return ServiceResult<TResponse>.Failure($"Entity not found: {ex.Message}", ServiceResultStatus.NotFound);
@@ -121,6 +125,10 @@ namespace OrderProcessingSystem.Api.Services
                 var entityToUpdate = entity.Adapt<TEntity>();
                 await _repository.UpdateAsync(id, entityToUpdate);
                 return ServiceResult.Success("Entity updated successfully.");
+            }
+            catch (ConflictDbException ex)
+            {
+                return ServiceResult.Failure($"Conflict error: {ex.Message}", ServiceResultStatus.Conflict);
             }
             catch (EntityNotFoundException ex)
             {
