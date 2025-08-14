@@ -19,15 +19,17 @@ namespace OrderProcessingSystem.Api.Controllers
         private readonly IOrderItemService _orderItemService;
         private readonly IProductService _productService;
         private readonly ICartItemService _cartItemService;
+        private readonly IMessageBrokerService _messageBroker;
 
         public UserController(IUserService userService,IOrderService orderService,IOrderItemService orderItemService,
-            IProductService productService,ICartItemService cartItemService)
+            IProductService productService,ICartItemService cartItemService,IMessageBrokerService messageBroker)
         {
             _userService = userService;
             _orderService = orderService;
             _orderItemService = orderItemService;
             _productService = productService;
             _cartItemService = cartItemService;
+            _messageBroker = messageBroker;
         }
         [HttpGet("cart",Name = "GetUserCartItemsAsync")]
         public async Task<IActionResult> GetUserCartItemsAsync()
@@ -123,6 +125,12 @@ namespace OrderProcessingSystem.Api.Controllers
                     }); 
                     await _cartItemService.DeleteAsync(item.Id);
                 }
+                var orderPlacedMessage = new OrderPlacedMessage()
+                {
+                    Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value!,
+                    Order = result.Data,
+                };
+                await _messageBroker.SendMessage<OrderPlacedMessage>(orderPlacedMessage);
                 return CreatedAtRoute(nameof(GetUserOrdersAsync), null, result.Data);
             }
             return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse.Failure("Unexpected error occurred"));
