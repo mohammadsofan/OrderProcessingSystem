@@ -130,6 +130,7 @@ namespace OrderProcessingSystem.Api.Repositories
                 {
                     throw new EntityNotFoundException($"Entity with id {id} not found.");
                 }
+                entity.Id = existingEntity.Id;
                 _context.Entry(existingEntity).CurrentValues.SetValues(entity);
                 await SaveChangesAsync();
             }
