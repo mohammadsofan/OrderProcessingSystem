@@ -76,11 +76,11 @@ namespace OrderProcessingSystem.OrderPlacedService
                                         </thead>
                                         <tbody>
                                             {string.Join("", orderPlacedMessage!.Items.Select(item =>
-                                                $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>{item.Price:$}</td></tr>"
+                                                $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>${item.Price}</td></tr>"
                                             ))}
                                         </tbody>
                                     </table>
-                                    <p style='font-size: 1.1em;'><strong>Total Amount:</strong> {orderPlacedMessage?.TotalAmount:$}</p>
+                                    <p style='font-size: 1.1em;'><strong>Total Amount:</strong> ${orderPlacedMessage?.TotalAmount}</p>
                                     <p>We will notify you once your order has been shipped.</p>
                                     <p style='color: gray;'>If you have any questions, feel free to reply to this email.</p>
                                     <p>Best regards,<br/>Our Store Team</p>
@@ -88,7 +88,7 @@ namespace OrderProcessingSystem.OrderPlacedService
                                 </html>
                                 "
                             );
-                            _logger.LogInformation("Processed order placed message and sent email to {Email}", orderPlacedMessage.Email);
+                            _logger.LogInformation("Processed order placed message and sent email to {Email}", orderPlacedMessage?.Email);
                         }
                         catch (Exception ex)
                         {
