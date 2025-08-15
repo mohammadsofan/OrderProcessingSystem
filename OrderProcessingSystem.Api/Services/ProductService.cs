@@ -10,7 +10,7 @@ namespace OrderProcessingSystem.Api.Services
     {
         private readonly IProductRepository _repository;
 
-        public ProductService(IProductRepository repository) : base(repository)
+        public ProductService(IProductRepository repository,ILogger<ProductService> logger) : base(repository, logger)
         {
             _repository = repository;
         }

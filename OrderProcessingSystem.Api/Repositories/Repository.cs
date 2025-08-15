@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OrderProcessingSystem.Api.Data;
 using OrderProcessingSystem.Api.Exceptions;
 using OrderProcessingSystem.Api.Interfaces;
@@ -7,14 +8,16 @@ using System.Linq.Expressions;
 
 namespace OrderProcessingSystem.Api.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class,IEntity
+    public class Repository<T> : IRepository<T> where T : class, IEntity
     {
         private readonly ApplicationDbContext _context;
         private readonly DbSet<T> _dbSet;
-        public Repository(ApplicationDbContext context)
+        private readonly ILogger<Repository<T>> _logger;
+        public Repository(ApplicationDbContext context, ILogger<Repository<T>> logger)
         {
             _context = context;
-            _dbSet =context.Set<T>();
+            _dbSet = context.Set<T>();
+            _logger = logger;
         }
         public async Task AddAsync(T entity)
         {
@@ -25,10 +28,12 @@ namespace OrderProcessingSystem.Api.Repositories
             }
             catch (DbUpdateException ex)
             {
+                _logger.LogError(ex, "An error occurred while adding the entity to the database.");
                 throw new ConflictDbException("An error occurred while adding the entity to the database.", ex);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred in AddAsync.");
                 throw;
             }
         }
@@ -40,13 +45,15 @@ namespace OrderProcessingSystem.Api.Repositories
                 var entity = await _dbSet.FindAsync(id);
                 if (entity == null)
                 {
+                    _logger.LogWarning("Entity with id {Id} not found for deletion.", id);
                     throw new EntityNotFoundException($"Entity with id {id} not found.");
                 }
                 _dbSet.Remove(entity);
                 await SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred in DeleteAsync.");
                 throw;
             }
         }
@@ -67,8 +74,9 @@ namespace OrderProcessingSystem.Api.Repositories
                 }
                 return await queryable.ToListAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred in GetAllByFilterAsync.");
                 throw;
             }
         }
@@ -82,11 +90,12 @@ namespace OrderProcessingSystem.Api.Repositories
                 {
                     queryable = queryable.Include(include);
                 }
-                queryable = queryable.Where(e=>e.Id == id);
+                queryable = queryable.Where(e => e.Id == id);
                 return await queryable.FirstOrDefaultAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred in GetByIdAsync.");
                 throw;
             }
         }
@@ -104,30 +113,34 @@ namespace OrderProcessingSystem.Api.Repositories
                 queryable = queryable.Where(filter);
                 return await queryable.FirstOrDefaultAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred in GetOneByFilterAsync.");
                 throw;
             }
         }
 
         public async Task SaveChangesAsync()
         {
-            try { 
+            try
+            {
                 await _context.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred in SaveChangesAsync.");
                 throw;
             }
         }
 
-        public async Task UpdateAsync(int id,T entity)
+        public async Task UpdateAsync(int id, T entity)
         {
             try
             {
                 var existingEntity = await _dbSet.FindAsync(id);
                 if (existingEntity == null)
                 {
+                    _logger.LogWarning("Entity with id {Id} not found for update.", id);
                     throw new EntityNotFoundException($"Entity with id {id} not found.");
                 }
                 entity.Id = existingEntity.Id;
@@ -136,10 +149,12 @@ namespace OrderProcessingSystem.Api.Repositories
             }
             catch (DbUpdateException ex)
             {
+                _logger.LogError(ex, "An error occurred while updating the entity in the database.");
                 throw new ConflictDbException("An error occurred while updating the entity in the database.", ex);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An unexpected error occurred in UpdateAsync.");
                 throw;
             }
         }

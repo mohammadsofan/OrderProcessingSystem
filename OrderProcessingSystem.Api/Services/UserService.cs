@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using OrderProcessingSystem.Api.Constants;
 using OrderProcessingSystem.Api.Dtos.Requests;
 using OrderProcessingSystem.Api.Enums;
@@ -31,15 +32,17 @@ namespace OrderProcessingSystem.Api.Services
         {
             try
             {
-                _logger.LogWarning("test warning");
+                _logger.LogInformation("Attempting login for email: {Email}", request.Email);
                 var user = await _repository.GetOneByFilterAsync(u => u.Email.ToLower() == request.Email.ToLower());
                 if (user == null)
                 {
+                    _logger.LogWarning("Login failed: User with email {Email} not found.", request.Email);
                     return ServiceResult<object>.Failure("Invalid email or password.",ServiceResultStatus.BadRequest);
                 }
                 var passwordVerificationResult = _passwordHasher.VerifyHashedPassword(request, user.HashedPassword, request.Password);
                 if (passwordVerificationResult == PasswordVerificationResult.Failed)
                 {
+                    _logger.LogWarning("Login failed: Invalid password for email {Email}.", request.Email);
                     return ServiceResult<object>.Failure("Invalid email or password.", ServiceResultStatus.BadRequest);
                 }
 
@@ -50,10 +53,12 @@ namespace OrderProcessingSystem.Api.Services
                     user.Role,
                     DateTime.UtcNow.AddHours(1)
                 );
+                _logger.LogInformation("User {Email} logged in successfully.", request.Email);
                 return ServiceResult<object>.Success(new { Token = token }, "User Logged in successfully.");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Failure with login process for email: {Email}", request.Email);
                 return ServiceResult<object>.Failure($"Failure with login process: {ex.Message}");
             }
         }
@@ -61,6 +66,7 @@ namespace OrderProcessingSystem.Api.Services
         {
             try
             {
+                _logger.LogInformation("Attempting registration for email: {Email}", request.Email);
                 var user = new User
                 {
                     FirstName = request.FirstName,
@@ -71,14 +77,17 @@ namespace OrderProcessingSystem.Api.Services
                     Role = ApplicationRoles.User
                 };
                 await _repository.AddAsync(user);
+                _logger.LogInformation("User registered successfully: {Email}", request.Email);
                 return ServiceResult.Success("User registered successfully.");
             }
             catch (ConflictDbException ex)
             {
+                _logger.LogWarning(ex, "Conflict error during registration for email: {Email}", request.Email);
                 return ServiceResult.Failure($"Conflict error: {ex.Message}", ServiceResultStatus.Conflict);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Failure with register process for email: {Email}", request.Email);
                 return ServiceResult.Failure($"Failure with register proccess :{ex.Message}");
             }
         }

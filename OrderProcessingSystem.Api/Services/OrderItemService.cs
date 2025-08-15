@@ -9,7 +9,7 @@ namespace OrderProcessingSystem.Api.Services
     public class OrderItemService:Service<OrderItemRequestDto, OrderItemResponseDto, OrderItem>, IOrderItemService
     {
         private readonly IOrderItemRepository _repository;
-        public OrderItemService(IOrderItemRepository repository) : base(repository)
+        public OrderItemService(IOrderItemRepository repository,ILogger<OrderItemService> logger) : base(repository,logger)
         {
             _repository = repository;
         }

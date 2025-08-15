@@ -8,7 +8,7 @@ namespace OrderProcessingSystem.Api.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public CartItemRepository(ApplicationDbContext context) : base(context)
+        public CartItemRepository(ApplicationDbContext context,ILogger<CartItemRepository> logger) : base(context,logger)
         {
             _context = context;
         }

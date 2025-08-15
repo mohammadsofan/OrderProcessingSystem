@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.Extensions.Logging;
 using OrderProcessingSystem.Api.Enums;
 using OrderProcessingSystem.Api.Exceptions;
 using OrderProcessingSystem.Api.Interfaces.IRepository;
@@ -14,10 +15,12 @@ namespace OrderProcessingSystem.Api.Services
         where TResponse : class
     {
         private readonly IRepository<TEntity> _repository;
+        private readonly ILogger<Service<TRequest, TResponse, TEntity>> _logger;
 
-        public Service(IRepository<TEntity> repository)
+        public Service(IRepository<TEntity> repository, ILogger<Service<TRequest, TResponse, TEntity>> logger)
         {
             _repository = repository;
+            _logger = logger;
         }
         public async Task<ServiceResult<TResponse>> AddAsync(TRequest entity)
         {
@@ -30,14 +33,17 @@ namespace OrderProcessingSystem.Api.Services
             }
             catch (ConflictDbException ex)
             {
+                _logger.LogError(ex, "Conflict error while adding entity.");
                 return ServiceResult<TResponse>.Failure($"Conflict error: {ex.Message}", ServiceResultStatus.Conflict);
             }
             catch (EntityNotFoundException ex)
             {
+                _logger.LogWarning(ex, "Entity not found while adding entity.");
                 return ServiceResult<TResponse>.Failure($"Entity not found: {ex.Message}", ServiceResultStatus.NotFound);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error while adding entity.");
                 return ServiceResult<TResponse>.Failure($"Error while adding entity: {ex.Message}");
             }
         }
@@ -51,10 +57,12 @@ namespace OrderProcessingSystem.Api.Services
             }
             catch (EntityNotFoundException ex)
             {
+                _logger.LogWarning(ex, "Entity not found while deleting entity with id {Id}.", id);
                 return ServiceResult.Failure($"Entity not found: {ex.Message}", ServiceResultStatus.NotFound);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error while deleting entity with id {Id}.", id);
                 return ServiceResult.Failure($"Error while deleting entity: {ex.Message}");
             }
         }
@@ -64,7 +72,7 @@ namespace OrderProcessingSystem.Api.Services
         {
             try
             {
-                var response = (await _repository.GetAllByFilterAsync(filter,includes))
+                var response = (await _repository.GetAllByFilterAsync(filter, includes))
                     .Select(entity => entity.Adapt<TResponse>())
                     .ToList();
                 return ServiceResult<IEnumerable<TResponse>>.Success(response,
@@ -73,6 +81,7 @@ namespace OrderProcessingSystem.Api.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error while fetching entities.");
                 return ServiceResult<IEnumerable<TResponse>>.Failure($"Error while fetching entities: {ex.Message}");
             }
         }
@@ -81,9 +90,10 @@ namespace OrderProcessingSystem.Api.Services
         {
             try
             {
-                var entity = await _repository.GetByIdAsync(id,includes);
+                var entity = await _repository.GetByIdAsync(id, includes);
                 if (entity == null)
                 {
+                    _logger.LogWarning("Entity with id {Id} not found.", id);
                     return ServiceResult<TResponse?>.Failure("Entity not found.", ServiceResultStatus.NotFound);
                 }
                 else
@@ -93,6 +103,7 @@ namespace OrderProcessingSystem.Api.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error while fetching entity with id {Id}.", id);
                 return ServiceResult<TResponse?>.Failure($"Error while fetching entity: {ex.Message}");
             }
         }
@@ -105,6 +116,7 @@ namespace OrderProcessingSystem.Api.Services
                 var entity = await _repository.GetOneByFilterAsync(filter, includes);
                 if (entity == null)
                 {
+                    _logger.LogWarning("Entity not found for provided filter.");
                     return ServiceResult<TResponse?>.Failure("Entity not found.", ServiceResultStatus.NotFound);
                 }
                 else
@@ -114,6 +126,7 @@ namespace OrderProcessingSystem.Api.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error while fetching entity by filter.");
                 return ServiceResult<TResponse?>.Failure($"Error while fetching entity: {ex.Message}");
             }
         }
@@ -128,14 +141,17 @@ namespace OrderProcessingSystem.Api.Services
             }
             catch (ConflictDbException ex)
             {
+                _logger.LogError(ex, "Conflict error while updating entity with id {Id}.", id);
                 return ServiceResult.Failure($"Conflict error: {ex.Message}", ServiceResultStatus.Conflict);
             }
             catch (EntityNotFoundException ex)
             {
+                _logger.LogWarning(ex, "Entity with id {Id} not found for update.", id);
                 return ServiceResult.Failure($"Entity not found: {ex.Message}", ServiceResultStatus.NotFound);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error while updating entity with id {Id}.", id);
                 return ServiceResult.Failure($"Error while updating entity: {ex.Message}");
             }
         }

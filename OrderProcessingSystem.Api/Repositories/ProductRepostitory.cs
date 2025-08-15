@@ -8,7 +8,7 @@ namespace OrderProcessingSystem.Api.Repositories
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductRepostitory(ApplicationDbContext context) : base(context)
+        public ProductRepostitory(ApplicationDbContext context,ILogger<ProductRepostitory> logger) : base(context, logger)
         {
             _context = context;
         }
