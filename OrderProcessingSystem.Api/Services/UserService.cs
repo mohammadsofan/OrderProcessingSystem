@@ -15,19 +15,23 @@ namespace OrderProcessingSystem.Api.Services
         private readonly IUserRepository _repository;
         private readonly IPasswordHasher<object> _passwordHasher;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<UserService> _logger;
 
         public UserService(IUserRepository repository,
             IPasswordHasher<object> passwordHasher,
-            ITokenService tokenService)
+            ITokenService tokenService, 
+            ILogger<UserService> logger)
         {
             _repository = repository;
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;
+            _logger = logger;
         }
         public async Task<ServiceResult<object>> LoginUserAsync(LoginUserRequestDto request)
         {
             try
             {
+                _logger.LogWarning("test warning");
                 var user = await _repository.GetOneByFilterAsync(u => u.Email.ToLower() == request.Email.ToLower());
                 if (user == null)
                 {

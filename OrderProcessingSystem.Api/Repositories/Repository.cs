@@ -14,7 +14,7 @@ namespace OrderProcessingSystem.Api.Repositories
         public Repository(ApplicationDbContext context)
         {
             _context = context;
-            _dbSet=context.Set<T>();
+            _dbSet =context.Set<T>();
         }
         public async Task AddAsync(T entity)
         {

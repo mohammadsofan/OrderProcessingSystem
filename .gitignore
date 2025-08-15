@@ -1,5 +1,5 @@
 .vs/
 OrderProcessingSystem.Api/bin/
 OrderProcessingSystem.Api/obj/
-OrderProcessingSystem.OrderService/bin/
-OrderProcessingSystem.OrderService/obj/
+OrderProcessingSystem.OrderPlacedService/bin/
+OrderProcessingSystem.OrderPlacedService/obj/

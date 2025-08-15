@@ -21,7 +21,7 @@ services:
     depends_on:
       - db
       - rabbitmq
-
+      - seq
   consumer_project:
     build:
       context: ./OrderProcessingSystem.OrderPlacedService
@@ -38,6 +38,7 @@ services:
        - my_network
     depends_on:
       - rabbitmq
+      - seq
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -61,3 +62,18 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     networks:
       - my_network
+  seq:
+     image: datalust/seq:latest
+     container_name: seq_container
+     ports:
+       - "9090:80"
+       - "5341:5341"
+     environment:
+       - ACCEPT_EULA=Y
+       - SEQ_FIRSTRUN_ADMINPASSWORD=admin@123
+     networks:
+       - my_network
+     volumes:
+       - seq_data:/data
+volumes:
+    seq_data:

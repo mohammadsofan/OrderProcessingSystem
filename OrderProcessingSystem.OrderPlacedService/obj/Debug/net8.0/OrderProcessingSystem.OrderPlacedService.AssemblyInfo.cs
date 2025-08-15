@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OrderProcessingSystem.OrderPlacedService")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8d32132ec1d8725c8140723c220679f4ec23d344")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+75d31803747ce833cb36a6da9434ba149600866b")]
 [assembly: System.Reflection.AssemblyProductAttribute("OrderProcessingSystem.OrderPlacedService")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OrderProcessingSystem.OrderPlacedService")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
